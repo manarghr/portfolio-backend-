@@ -1,10 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const Contact = require('./models/Contact'); // Import the schema
+const Contact = require('./models/Contact'); 
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
@@ -14,7 +13,6 @@ app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
-    // Validate required fields
     if (!name || !email || !subject || !message) {
       return res.status(400).json({
         success: false,
@@ -22,17 +20,9 @@ app.post('/api/contact', async (req, res) => {
       });
     }
 
-    // Create new contact message using the schema
-    const newContact = new Contact({
-      name,
-      email,
-      subject,
-      message
-    });
-
-    // Save to database
+    const newContact = new Contact({ name, email, subject, message });
     await newContact.save();
-    
+
     console.log('📧 New message from:', name, '- Email:', email);
 
     res.status(201).json({
@@ -81,13 +71,12 @@ app.patch('/api/contacts/:id/read', async (req, res) => {
   }
 });
 
-// Test
+// Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: '🚀 Backend working!' });
 });
 
-
-// Connect to MongoDB
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -97,8 +86,9 @@ mongoose.connect(process.env.MONGO_URI, {
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
   });
+
 }).catch((err) => {
-  console.error("❌ MongoDB connection error:", err);
+  console.log("❌ Error connecting to the database", err);
 });
