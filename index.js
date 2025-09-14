@@ -1,16 +1,23 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const Contact = require('./models/Contact'); 
+const Contact = require('./models/Contact');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// Health check for the contact endpoint
+app.get('/api/contact', (req, res) => {
+  res.json({ message: "Use POST to send a new message ✅" });
+});
+
 // POST METHOD: Create a new contact message
 app.post('/api/contact', async (req, res) => {
   try {
+    console.log("📥 Incoming data:", req.body); // log what frontend sends
+
     const { name, email, subject, message } = req.body;
 
     if (!name || !email || !subject || !message) {
@@ -67,6 +74,7 @@ app.patch('/api/contacts/:id/read', async (req, res) => {
     );
     res.json({ success: true, data: contact });
   } catch (error) {
+    console.error('❌ Error updating message:', error);
     res.status(500).json({ success: false, message: 'Error updating message' });
   }
 });
@@ -90,5 +98,5 @@ mongoose.connect(process.env.MONGO_URI, {
   });
 
 }).catch((err) => {
-  console.log("❌ Error connecting to the database", err);
+  console.error("❌ Error connecting to the database", err);
 });
